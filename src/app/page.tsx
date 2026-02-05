@@ -92,7 +92,11 @@ export default function Home() {
             {/* Feature Card 1 */}
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 border border-purple-100">
               <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-                <div className="w-full h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=200&fit=crop&q=80" 
+                  alt="Transaction Inbox - Receipt"
+                  className="w-full h-32 object-cover rounded-xl"
+                />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Transaction Inbox</h3>
               <p className="text-slate-600">Upload CSVs, categorize to CRA lines, and attach receipts effortlessly.</p>
@@ -101,7 +105,11 @@ export default function Home() {
             {/* Feature Card 2 */}
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 border border-blue-100">
               <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-                <div className="w-full h-32 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=400&h=200&fit=crop&q=80" 
+                  alt="Draft T776 Forms - Tax form"
+                  className="w-full h-32 object-cover rounded-xl"
+                />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Draft T776 Forms</h3>
               <p className="text-slate-600">Auto-generate watermarked draft forms with CCA schedules instantly.</p>
@@ -110,7 +118,11 @@ export default function Home() {
             {/* Feature Card 3 */}
             <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl p-8 border border-orange-100">
               <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-                <div className="w-full h-32 bg-gradient-to-br from-orange-400 to-yellow-400 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&h=200&fit=crop&q=80" 
+                  alt="Accountant Collaboration - Business meeting"
+                  className="w-full h-32 object-cover rounded-xl"
+                />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Accountant Collaboration</h3>
               <p className="text-slate-600">Invite your accountant for read-only access and seamless export packs.</p>
@@ -119,7 +131,11 @@ export default function Home() {
             {/* Feature Card 4 */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-3xl p-8 border border-green-100">
               <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-                <div className="w-full h-32 bg-gradient-to-br from-green-400 to-emerald-400 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=400&h=200&fit=crop&q=80" 
+                  alt="Ontario RTA Notices - Legal documents"
+                  className="w-full h-32 object-cover rounded-xl"
+                />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Ontario RTA Notices</h3>
               <p className="text-slate-600">Generate RTA-compliant notice templates with prefilled property data.</p>
@@ -128,7 +144,11 @@ export default function Home() {
             {/* Feature Card 5 */}
             <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl p-8 border border-indigo-100">
               <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-                <div className="w-full h-32 bg-gradient-to-br from-indigo-400 to-purple-400 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1544396821-4dd40b938ad3?w=400&h=200&fit=crop&q=80" 
+                  alt="Accountant Export Packs - Organized documents"
+                  className="w-full h-32 object-cover rounded-xl"
+                />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Accountant Export Packs</h3>
               <p className="text-slate-600">Generate comprehensive ZIP packs with ledgers and receipts.</p>
@@ -137,7 +157,11 @@ export default function Home() {
             {/* Feature Card 6 */}
             <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-3xl p-8 border border-teal-100">
               <div className="bg-white rounded-2xl p-6 mb-6 shadow-sm">
-                <div className="w-full h-32 bg-gradient-to-br from-teal-400 to-cyan-400 rounded-xl"></div>
+                <img 
+                  src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=200&fit=crop&q=80" 
+                  alt="Property Management - Residential house"
+                  className="w-full h-32 object-cover rounded-xl"
+                />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Property Management</h3>
               <p className="text-slate-600">Track properties, units, ownership splits, and mortgage details.</p>
