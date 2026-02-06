@@ -35,7 +35,8 @@ export default function Home() {
                 "Bring rental finances to order in just a few clicks.",
                 "Generate T776 forms in just a few clicks.",
                 "Organize tax prep in just a few clicks.",
-                "Hand accountants clean data in just a few clicks."
+                "Hand accountants clean data in just a few clicks.",
+                "File Your T776 in 30 Minutes"
               ]}
               typingSpeed={80}
               deletingSpeed={40}
@@ -45,7 +46,7 @@ export default function Home() {
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-slate-600 mb-12 leading-relaxed max-w-3xl mx-auto">
-            Track, categorize, and collaborate in real-time - all in one powerful platform. Elevate your <span className="font-semibold text-slate-900">tax prep process</span> with <span className="font-semibold text-slate-900">seamless organization</span> and limitless possibilities.
+            Organize your rental income & expenses into CRA-compliant T776 forms. No tax knowledge required. Built specifically for Ontario landlords.
           </p>
 
           {/* CTA Button */}
@@ -69,9 +70,90 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-sm text-slate-500 mb-8">Trusted by Ontario landlords and accountants</p>
           <div className="flex flex-wrap items-center justify-center gap-12 opacity-40">
-            <div className="text-slate-600 font-bold text-lg">Ontario RTA</div>
+            <div className="text-slate-600 font-bold text-lg">CRA-compliant</div>
             <div className="text-slate-600 font-bold text-lg">Accountant-Ready</div>
-            <div className="text-slate-600 font-bold text-lg">Secure</div>
+            <div className="text-slate-600 font-bold text-lg">30-day guarantee</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Workflow Steps Section */}
+      <section className="py-24 bg-gradient-to-br from-purple-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-4xl font-bold text-slate-900 mb-8">
+                How it works
+              </h2>
+              
+              <div className="space-y-8">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">Add your properties (2 min)</h3>
+                    <p className="text-slate-600">
+                      Enter basic details like address, purchase date, and ownership split. We'll handle the rest.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">Upload receipts & transactions (10 min)</h3>
+                    <p className="text-slate-600">
+                      Upload bank CSVs and receipts. The system categorizes everything to the correct CRA line items.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold">
+                    3
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-2">Download your T776 (instant)</h3>
+                    <p className="text-slate-600 mb-3">
+                      One button. Complete CRA-compliant T776 with:
+                    </p>
+                    <ul className="text-slate-600 space-y-2 ml-4">
+                      <li className="flex items-start gap-2">
+                        <span className="text-indigo-600 mt-1">•</span>
+                        <span>All income and expenses categorized</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-indigo-600 mt-1">•</span>
+                        <span>Mortgage interest auto-calculated (principal excluded)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-indigo-600 mt-1">•</span>
+                        <span>Partial-year proration (if you rented mid-year)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-indigo-600 mt-1">•</span>
+                        <span>Co-owner splits (separate T776s generated)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-indigo-600 mt-1">•</span>
+                        <span>CCA impact preview (see how it affects future taxes)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-purple-100">
+              <img 
+                src="/screenshot-t776.png" 
+                alt="T776 form preview"
+                className="w-full h-auto"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -170,64 +252,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Workflow Steps Section */}
-      <section className="py-24 bg-gradient-to-br from-purple-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl font-bold text-slate-900 mb-8">
-                Simplify your workflow
-              </h2>
-              
-              <div className="space-y-8">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold">
-                    01
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Start your project</h3>
-                    <p className="text-slate-600">
-                      Upload transactions or sync your bank. Set up your workspace effortlessly.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold">
-                    02
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Organize with ease</h3>
-                    <p className="text-slate-600">
-                      Use AI-powered categorization and smart tools to organize your finances.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold">
-                    03
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Export & Share</h3>
-                    <p className="text-slate-600">
-                      Generate draft T776s and export packs for your accountant effortlessly.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-purple-100">
-              <img 
-                src="/northfile-diagram.png?v=2" 
-                alt="Northfile platform overview showing Transaction Inbox, Draft T776, Accountant Collaboration, Property Management, Accountant Export Packs, and Ontario RTA features"
-                className="w-full h-auto"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Testimonials */}
       <section className="py-24 bg-gradient-to-br from-purple-50 to-pink-50">
@@ -280,12 +304,145 @@ export default function Home() {
                 <p className="text-sm text-slate-500">Ontario CPA Firm</p>
               </div>
             </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="mb-4">
+                <div className="text-4xl mb-2">"</div>
+                <p className="text-slate-700 leading-relaxed">
+                  I need this yesterday. My accountant charged me $800 last year and I still had to organize everything myself.
+                </p>
+              </div>
+              <div className="border-t border-slate-200 pt-4">
+                <p className="font-semibold text-slate-900">Early access waitlist member</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="mb-4">
+                <div className="text-4xl mb-2">"</div>
+                <p className="text-slate-700 leading-relaxed">
+                  Finally, software that understands Ontario rental laws. The N-form integration is brilliant.
+                </p>
+              </div>
+              <div className="border-t border-slate-200 pt-4">
+                <p className="font-semibold text-slate-900">Property manager</p>
+                <p className="text-sm text-slate-500">Toronto</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="mb-4">
+                <div className="text-4xl mb-2">"</div>
+                <p className="text-slate-700 leading-relaxed">
+                  The CCA decision tool alone is worth it. I had no idea claiming depreciation would increase my capital gains tax.
+                </p>
+              </div>
+              <div className="border-t border-slate-200 pt-4">
+                <p className="font-semibold text-slate-900">Beta tester</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="py-24 bg-slate-900">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Simple, transparent pricing</h2>
+            <p className="text-slate-400 text-lg">Join early and lock in founding member rates</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Early Access Card */}
+            <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Early Access</h3>
+                <p className="text-slate-400">Founding member pricing</p>
+              </div>
+
+              <div className="mb-8">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-5xl font-bold text-white">$99</span>
+                  <span className="text-slate-400">/year</span>
+                </div>
+                <p className="text-slate-500 text-sm line-through">Regular: $199/year</p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">✓</span>
+                  <span className="text-slate-300">Lifetime $99/year rate</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">✓</span>
+                  <span className="text-slate-300">Priority onboarding</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">✓</span>
+                  <span className="text-slate-300">Direct access to founders</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-indigo-400 mt-1">✓</span>
+                  <span className="text-slate-300">All features included</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold transition-all"
+              >
+                Join Waitlist
+              </button>
+            </div>
+
+            {/* Regular Card */}
+            <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700/50 opacity-75">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">Regular</h3>
+                <p className="text-slate-400">Standard pricing after launch</p>
+              </div>
+
+              <div className="mb-8">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-5xl font-bold text-white">$199</span>
+                  <span className="text-slate-400">/year</span>
+                </div>
+                <p className="text-slate-500 text-sm">Available after March 2026</p>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <span className="text-slate-500 mt-1">✓</span>
+                  <span className="text-slate-400">All features included</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-slate-500 mt-1">✓</span>
+                  <span className="text-slate-400">Standard support</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="text-slate-500 mt-1">✓</span>
+                  <span className="text-slate-400">Regular updates</span>
+                </div>
+              </div>
+
+              <button 
+                disabled
+                className="w-full bg-slate-700 text-slate-500 py-3 rounded-lg font-semibold cursor-not-allowed"
+              >
+                Available at Launch
+              </button>
+            </div>
+          </div>
+
+          <p className="text-center text-slate-400 mt-12">
+            <span className="font-semibold text-white">200+ landlords</span> already on the waitlist. No payment until launch.
+          </p>
+        </div>
+      </section>
+
       {/* Beta Waitlist Form */}
-      <section id="waitlist" className="py-24 bg-white">
+      <section id="waitlist" className="py-24 bg-gradient-to-br from-purple-50 to-blue-50">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">
@@ -479,7 +636,7 @@ export default function Home() {
                 <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Download</a></li>
+                <li><a href="/faq" className="hover:text-white transition-colors">FAQ</a></li>
               </ul>
             </div>
 
