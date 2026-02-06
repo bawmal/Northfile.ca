@@ -220,7 +220,7 @@ export default function Home() {
 
             <div className="bg-white rounded-3xl p-8 shadow-xl border border-purple-100">
               <img 
-                src="/northfile-diagram.png" 
+                src="/northfile-diagram.png?v=2" 
                 alt="Northfile platform overview showing Transaction Inbox, Draft T776, Accountant Collaboration, Property Management, Accountant Export Packs, and Ontario RTA features"
                 className="w-full h-auto"
               />
