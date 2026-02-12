@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import TypewriterText from "@/components/TypewriterText";
 
 export default function AltLandingPage() {
@@ -48,10 +49,10 @@ export default function AltLandingPage() {
 
           {/* CTA Button */}
           <div className="flex flex-col items-center gap-4">
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-lg font-semibold transition-all text-lg flex items-center gap-2 shadow-lg hover:shadow-xl">
+            <Link href="/auth/signup" className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-lg font-semibold transition-all text-lg flex items-center gap-2 shadow-lg hover:shadow-xl">
               Get Started • it's free
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
             <p className="text-sm text-slate-500">
               200+ landlords waiting for launch
             </p>

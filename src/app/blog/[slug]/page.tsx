@@ -1,36 +1,275 @@
-import { Calendar, Clock, ArrowLeft, Share2, Bookmark } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, Share2, Bookmark, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { getPostBySlug } from "@/lib/blog-data";
+import { Metadata } from "next";
 
-export default function BlogPostPage() {
+// Generate SEO metadata for blog posts
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
+
+  if (!post) {
+    return {
+      title: 'Blog Post Not Found | Northfile',
+      description: 'The requested blog post could not be found.',
+    };
+  }
+
+  const baseUrl = 'https://northfile.ca';
+  const url = `${baseUrl}/blog/${post.slug}`;
+
+  return {
+    title: `${post.title} | Northfile Blog`,
+    description: post.excerpt,
+    keywords: post.keywords?.join(', '),
+    authors: post.author ? [{ name: post.author }] : undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      url: url,
+      siteName: 'Northfile',
+      images: [
+        {
+          url: post.image,
+          width: 1200,
+          height: 600,
+          alt: post.title,
+        },
+      ],
+      locale: 'en_CA',
+      type: 'article',
+      publishedTime: new Date(post.date).toISOString(),
+      authors: post.author ? [post.author] : undefined,
+      tags: post.keywords,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image],
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}
+
+// Blog posts data
+const blogPosts = {
+  "how-to-prepare-t776-ontario-rental-taxes": {
+    title: "How to Prepare a T776 in Ontario: Rental Taxes Without the Year-End Scramble",
+    excerpt: "If you own a rental property in Ontario, tax season probably feels familiar. This guide explains how Ontario landlords can prepare their T776 rental income form, track deductions properly, and avoid last-minute stress every spring.",
+    category: "Tax Forms",
+    date: "February 11, 2026",
+    readTime: "12 min read",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1200&h=600&fit=crop",
+    content: `<p>If you own a rental property in Ontario, tax season probably feels familiar.</p>
+<p>March arrives and suddenly you're:</p>
+<ul>
+<li>exporting CSV files from your bank</li>
+<li>searching for receipts</li>
+<li>calculating mortgage interest</li>
+<li>trying to remember repairs from last summer</li>
+<li>emailing your accountant repeatedly</li>
+<li>worrying you missed something</li>
+</ul>
+<p>This guide explains how Ontario landlords can prepare their T776 rental income form, track deductions properly, and avoid last-minute stress every spring.</p>
+
+<h2>What Is the T776 Rental Income Form in Ontario?</h2>
+<p>The T776 is the tax form used to report rental income and expenses from residential or commercial property.</p>
+<p>It includes:</p>
+<ul>
+<li>rent collected</li>
+<li>mortgage interest (not principal)</li>
+<li>property taxes</li>
+<li>utilities</li>
+<li>condo fees</li>
+<li>insurance</li>
+<li>repairs and maintenance</li>
+<li>advertising</li>
+<li>professional fees</li>
+<li>capital cost allowance (CCA)</li>
+</ul>
+<p>Each property — and sometimes each owner — must be handled separately.</p>
+<p>Mistakes can lead to:</p>
+<ul>
+<li>reassessments</li>
+<li>missing deductions</li>
+<li>incorrect capital-gain calculations later</li>
+<li>expensive follow-ups with accountants</li>
+</ul>
+
+<h2>How Ontario Landlords Prepare T776 Forms Today</h2>
+<p>Most small landlords rely on:</p>
+<ul>
+<li>spreadsheets</li>
+<li>separate bank accounts</li>
+<li>manual categorization</li>
+<li>pivot tables</li>
+<li>end-of-year cleanup sessions</li>
+</ul>
+<p>Some people update things monthly and feel in control.</p>
+<p>Others wait until tax season — which is when things become painful.</p>
+<p>A consistent theme:</p>
+<p><strong>Recurring bills are easy.</strong><br />
+Mortgage payments, utilities, condo fees, property taxes.</p>
+<p><strong>Non-recurring expenses get missed.</strong><br />
+Repairs, appliances, special assessments, emergency plumbers.</p>
+<p>Those forgotten costs quietly reduce your deductions.</p>
+
+<h2>Why Rental Portfolios Get Harder to Manage as They Grow</h2>
+<p>Spreadsheets work… until complexity creeps in.</p>
+<p>Things get harder when you have:</p>
+<ul>
+<li>multiple properties</li>
+<li>co-owners</li>
+<li>partial-year rentals</li>
+<li>refinancing</li>
+<li>variable-rate mortgages</li>
+<li>renovations</li>
+<li>condo portfolios</li>
+<li>rent increases or arrears</li>
+</ul>
+<p>Suddenly you're dealing with:</p>
+<ul>
+<li>ownership splits</li>
+<li>proration rules</li>
+<li>mortgage interest reconciliations</li>
+<li>separate forms per owner</li>
+<li>audit documentation</li>
+</ul>
+<p>This is when many landlords start paying accountants just to clean things up.</p>
+
+<h2>The Calm Way to Prepare Rental Taxes: Track Lightly All Year</h2>
+<p>The landlords who feel relaxed in April usually didn't wait until April.</p>
+<p>They:</p>
+<ul>
+<li>log transactions monthly</li>
+<li>keep digital receipts</li>
+<li>note repairs when they happen</li>
+<li>separate personal vs rental periods</li>
+<li>review summaries occasionally</li>
+<li>hand their accountant a clean export pack</li>
+</ul>
+<p>Instead of scrambling once a year, they spread the work across twelve months.</p>
+<p>That single change removes most of the stress.</p>
+
+<h2>What Northfile Is Building for Ontario Landlords</h2>
+<p>Northfile is designed specifically for Ontario rental compliance.</p>
+<p>Instead of scattered spreadsheets, Northfile helps landlords:</p>
+<ul>
+<li>track multiple properties in one place</li>
+<li>categorize transactions using tax-ready categories</li>
+<li>upload and match receipts</li>
+<li>manage co-ownership correctly</li>
+<li>split partial-year rentals</li>
+<li>estimate mortgage interest during the year</li>
+<li>reconcile official lender statements at filing time</li>
+<li>generate draft T776 forms</li>
+<li>prepare accountant-ready export packs</li>
+<li>generate Ontario rent notices like N1 and N4</li>
+</ul>
+<p>Our focus is simple:</p>
+<ul>
+<li>reduce year-end chaos</li>
+<li>prevent costly mistakes</li>
+<li>make working with your accountant effortless</li>
+</ul>
+
+<h2>Who Northfile Is For</h2>
+<p>Northfile is built for:</p>
+<ul>
+<li>Ontario landlords with growing portfolios</li>
+<li>condo investors</li>
+<li>co-owned properties</li>
+<li>people who hate spreadsheets</li>
+<li>landlords who work with accountants</li>
+<li>anyone tired of tax-season panic</li>
+</ul>
+<p>If your rentals are starting to feel complicated, that's usually the moment software begins paying for itself.</p>
+
+<h2>Get Ready Before Tax Season Hits</h2>
+<p>Tax deadlines don't move.</p>
+<p>The landlords who feel prepared in April usually started organizing long before then.</p>
+<p>If you'd like to see what an Ontario-specific T776 workflow looks like, you can visit Northfile.ca and join the Ontario launch cohort.</p>
+<p>Early users get priority access as we roll out province-by-province.</p>
+
+<h2>Final Thought</h2>
+<p>Spreadsheets aren't wrong.</p>
+<p>They're just fragile.</p>
+<p>Once rental portfolios involve co-owners, renovations, refinancing, or multiple properties, having a system built specifically for Ontario compliance can save time, money, and a lot of stress.</p>`
+  },
+};
+
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = blogPosts[slug as keyof typeof blogPosts];
+  const postData = getPostBySlug(slug);
+  
+  if (!post || !postData) {
+    notFound();
+  }
+
+  // Structured data for SEO (JSON-LD)
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": postData.title,
+    "description": postData.excerpt,
+    "image": postData.image,
+    "datePublished": new Date(postData.date).toISOString(),
+    "dateModified": new Date(postData.date).toISOString(),
+    "author": {
+      "@type": "Organization",
+      "name": postData.author || "Northfile Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Northfile",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://northfile.ca/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://northfile.ca/blog/${postData.slug}`
+    },
+    "keywords": postData.keywords?.join(', ')
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="text-3xl font-light text-slate-900" style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '-0.02em' }}>
               Northfile
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900">Dashboard</Link>
-              <Link href="/properties" className="text-sm font-medium text-slate-600 hover:text-slate-900">Properties</Link>
+              <Link href="/" className="text-sm font-medium text-slate-600 hover:text-slate-900">Home</Link>
               <Link href="/blog" className="text-sm font-semibold text-blue-600">Blog</Link>
+              <Link href="/faq" className="text-sm font-medium text-slate-600 hover:text-slate-900">FAQ</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/auth/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">Sign In</Link>
-            <Link href="/auth/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-              Get Started
-            </Link>
+            {/* Blog-focused navigation - no product CTAs */}
           </div>
         </div>
       </header>
 
       {/* Back to Blog */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <Link href="/blog" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium">
-            <ArrowLeft className="w-4 h-4" />
+      <div className="bg-gradient-to-r from-slate-50 to-blue-50/30 border-b border-slate-200/60">
+        <div className="max-w-4xl mx-auto px-6 py-5">
+          <Link href="/blog" className="inline-flex items-center gap-2 text-slate-600 hover:text-blue-600 font-medium transition-colors group">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Blog
           </Link>
         </div>
@@ -38,335 +277,249 @@ export default function BlogPostPage() {
 
       {/* Article Header */}
       <article className="bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="mb-6">
-            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-              Tax Tips
+        <div className="max-w-4xl mx-auto px-6 py-16">
+          <div className="mb-8">
+            <span className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm">
+              {post.category}
             </span>
           </div>
           
-          <h1 className="text-5xl font-bold text-slate-900 mb-6 leading-tight">
-            Complete Guide to Landlord Tax Deductions in Ontario (2024)
+          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-8 leading-tight">
+            {post.title}
           </h1>
           
-          <div className="flex items-center gap-6 text-slate-600 mb-8">
+          <div className="flex items-center gap-6 text-slate-500 mb-10">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              <span>February 1, 2024</span>
+              <span>{post.date}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
-              <span>8 min read</span>
+              <span>{post.readTime}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 mb-8">
-            <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-200 hover:border-slate-300 rounded-lg font-semibold transition-colors">
+          <div className="flex items-center gap-3 mb-10">
+            <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-slate-200 hover:border-blue-300 hover:bg-blue-50 rounded-lg font-semibold transition-all shadow-sm hover:shadow">
               <Share2 className="w-4 h-4" />
               Share
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 border-2 border-slate-200 hover:border-slate-300 rounded-lg font-semibold transition-colors">
+            <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 rounded-lg font-semibold transition-all shadow-sm hover:shadow">
               <Bookmark className="w-4 h-4" />
               Save
             </button>
           </div>
 
-          <div className="relative h-96 rounded-2xl overflow-hidden mb-12">
+          <div className="relative h-96 rounded-2xl overflow-hidden mb-16 shadow-2xl ring-1 ring-slate-900/5">
             <img
-              src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1200&h=600&fit=crop"
-              alt="Tax deductions guide"
+              src={post.image}
+              alt={post.title}
               className="w-full h-full object-cover"
             />
           </div>
 
           {/* Article Content */}
-          <div className="prose prose-lg max-w-none">
-            <p className="text-xl text-slate-600 leading-relaxed mb-8">
-              As an Ontario landlord, understanding which expenses you can deduct from your rental income is crucial for minimizing your tax burden. 
-              This comprehensive guide covers all CRA-approved deductions for the 2024 tax year.
-            </p>
-
-            <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">What Are Rental Property Tax Deductions?</h2>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              Rental property tax deductions are expenses that the Canada Revenue Agency (CRA) allows you to subtract from your rental income 
-              when calculating your taxable income. These deductions can significantly reduce the amount of tax you owe on your rental properties.
-            </p>
-
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 my-8">
-              <h3 className="text-xl font-bold text-blue-900 mb-3">💡 Key Principle</h3>
-              <p className="text-blue-800 mb-0">
-                To be deductible, an expense must be <strong>reasonable</strong> and <strong>incurred to earn rental income</strong>. 
-                Personal expenses or capital improvements are generally not deductible in the year incurred.
-              </p>
+          <div className="space-y-12">
+            <div className="text-xl text-slate-600 leading-relaxed space-y-5 border-l-4 border-blue-500 pl-6 bg-gradient-to-r from-blue-50/50 to-transparent py-6 rounded-r-lg">
+              <p>If you own a rental property in Ontario, tax season probably feels familiar.</p>
+              <p>March arrives and suddenly you're:</p>
+              <ul className="list-disc pl-6 space-y-2 text-lg">
+                <li>exporting CSV files from your bank</li>
+                <li>searching for receipts</li>
+                <li>calculating mortgage interest</li>
+                <li>trying to remember repairs from last summer</li>
+                <li>emailing your accountant repeatedly</li>
+                <li>worrying you missed something</li>
+              </ul>
+              <p>This guide explains how Ontario landlords can prepare their T776 rental income form, track deductions properly, and avoid last-minute stress every spring.</p>
             </div>
 
-            <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">Common Deductible Expenses</h2>
-
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">1. Advertising</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              You can deduct the cost of advertising your rental property, including:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li>Online listing fees (Kijiji, Facebook Marketplace, Craigslist)</li>
-              <li>Newspaper classified ads</li>
-              <li>Rental agency fees for finding tenants</li>
-              <li>Professional photography for listings</li>
-              <li>Signage and "For Rent" signs</li>
-            </ul>
-
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">2. Insurance</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              Landlord insurance premiums are fully deductible, including:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li>Property insurance (fire, theft, liability)</li>
-              <li>Rental income loss insurance</li>
-              <li>Flood or earthquake insurance</li>
-            </ul>
-
-            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 my-8">
-              <h3 className="text-xl font-bold text-yellow-900 mb-3">⚠️ Important Note</h3>
-              <p className="text-yellow-800 mb-0">
-                If you live in part of the property, you can only deduct the portion of insurance that relates to the rental unit. 
-                For example, if you rent out a basement apartment that's 40% of your home's square footage, you can deduct 40% of your insurance premium.
-              </p>
-            </div>
-
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">3. Mortgage Interest</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              This is often the largest deduction for landlords. You can deduct:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li><strong>Mortgage interest</strong> (NOT principal payments)</li>
-              <li>Interest on loans used to purchase or improve the rental property</li>
-              <li>Interest on lines of credit used for rental property expenses</li>
-            </ul>
-
-            <div className="bg-slate-100 border-2 border-slate-300 rounded-xl p-6 my-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">📊 Example Calculation</h3>
-              <div className="space-y-2 text-slate-700">
-                <p><strong>Monthly mortgage payment:</strong> $2,000</p>
-                <p><strong>Principal portion:</strong> $800 (not deductible)</p>
-                <p><strong>Interest portion:</strong> $1,200 (deductible)</p>
-                <p className="pt-2 border-t-2 border-slate-400"><strong>Annual deduction:</strong> $1,200 × 12 = $14,400</p>
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">What Is the T776 Rental Income Form in Ontario?</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>The T776 is the tax form used to report rental income and expenses from residential or commercial property.</p>
+                <p className="font-semibold text-slate-900">It includes:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>rent collected</li>
+                  <li>mortgage interest (not principal)</li>
+                  <li>property taxes</li>
+                  <li>utilities</li>
+                  <li>condo fees</li>
+                  <li>insurance</li>
+                  <li>repairs and maintenance</li>
+                  <li>advertising</li>
+                  <li>professional fees</li>
+                  <li>capital cost allowance (CCA)</li>
+                </ul>
+                <p>Each property — and sometimes each owner — must be handled separately.</p>
+                <p className="font-semibold text-slate-900">Mistakes can lead to:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>reassessments</li>
+                  <li>missing deductions</li>
+                  <li>incorrect capital-gain calculations later</li>
+                  <li>expensive follow-ups with accountants</li>
+                </ul>
               </div>
             </div>
 
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">4. Property Taxes</h3>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              Municipal property taxes are fully deductible for rental properties. If you rent out part of your home, 
-              you can deduct the proportionate share of property taxes.
-            </p>
-
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">5. Utilities</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              If you pay for utilities that your tenant uses, you can deduct:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li>Electricity</li>
-              <li>Natural gas or heating oil</li>
-              <li>Water and sewer</li>
-              <li>Internet (if included in rent)</li>
-              <li>Cable TV (if included in rent)</li>
-            </ul>
-
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">6. Repairs and Maintenance</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              Expenses to maintain your property in its current condition are deductible. This includes:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li>Painting and decorating</li>
-              <li>Fixing leaks, broken windows, or damaged flooring</li>
-              <li>Replacing worn-out appliances with similar models</li>
-              <li>Lawn care and snow removal</li>
-              <li>Pest control</li>
-              <li>Cleaning between tenants</li>
-            </ul>
-
-            <div className="bg-red-50 border-2 border-red-300 rounded-xl p-6 my-8">
-              <h3 className="text-xl font-bold text-red-900 mb-3">🚫 Repairs vs. Improvements</h3>
-              <p className="text-red-800 mb-3">
-                <strong>Repairs</strong> maintain the property (deductible immediately). 
-                <strong>Improvements</strong> add value or extend useful life (must be depreciated as Capital Cost Allowance).
-              </p>
-              <div className="grid md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-white rounded-lg p-3">
-                  <p className="font-bold text-green-700 mb-2">✓ Repairs (Deductible)</p>
-                  <ul className="space-y-1 text-slate-700">
-                    <li>• Fixing a broken furnace</li>
-                    <li>• Repainting existing walls</li>
-                    <li>• Replacing broken tiles</li>
-                  </ul>
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">How Ontario Landlords Prepare T776 Forms Today</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>Most small landlords rely on:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>spreadsheets</li>
+                  <li>separate bank accounts</li>
+                  <li>manual categorization</li>
+                  <li>pivot tables</li>
+                  <li>end-of-year cleanup sessions</li>
+                </ul>
+                <p>Some people update things monthly and feel in control.</p>
+                <p>Others wait until tax season — which is when things become painful.</p>
+                <p>A consistent theme:</p>
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 border-l-4 border-blue-600 p-6 my-8 rounded-r-lg shadow-sm">
+                  <p className="font-bold text-blue-900 mb-2">👉 Recurring bills are easy.</p>
+                  <p className="text-blue-800">Mortgage payments, utilities, condo fees, property taxes.</p>
                 </div>
-                <div className="bg-white rounded-lg p-3">
-                  <p className="font-bold text-red-700 mb-2">✗ Improvements (CCA)</p>
-                  <ul className="space-y-1 text-slate-700">
-                    <li>• Installing a new furnace</li>
-                    <li>• Adding a new bathroom</li>
-                    <li>• Finishing a basement</li>
+                <div className="bg-gradient-to-r from-orange-50 to-orange-100/50 border-l-4 border-orange-600 p-6 my-8 rounded-r-lg shadow-sm">
+                  <p className="font-bold text-orange-900 mb-2">👉 Non-recurring expenses get missed.</p>
+                  <p className="text-orange-800">Repairs, appliances, special assessments, emergency plumbers.</p>
+                </div>
+                <p>Those forgotten costs quietly reduce your deductions.</p>
+              </div>
+            </div>
+
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">Why Rental Portfolios Get Harder to Manage as They Grow</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>Spreadsheets work… until complexity creeps in.</p>
+                <p className="font-semibold text-slate-900">Things get harder when you have:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>multiple properties</li>
+                  <li>co-owners</li>
+                  <li>partial-year rentals</li>
+                  <li>refinancing</li>
+                  <li>variable-rate mortgages</li>
+                  <li>renovations</li>
+                  <li>condo portfolios</li>
+                  <li>rent increases or arrears</li>
+                </ul>
+                <p className="font-semibold text-slate-900">Suddenly you're dealing with:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>ownership splits</li>
+                  <li>proration rules</li>
+                  <li>mortgage interest reconciliations</li>
+                  <li>separate forms per owner</li>
+                  <li>audit documentation</li>
+                </ul>
+                <p>This is when many landlords start paying accountants just to clean things up.</p>
+              </div>
+            </div>
+
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">The Calm Way to Prepare Rental Taxes: Track Lightly All Year</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>The landlords who feel relaxed in April usually didn't wait until April.</p>
+                <p>They:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>log transactions monthly</li>
+                  <li>keep digital receipts</li>
+                  <li>note repairs when they happen</li>
+                  <li>separate personal vs rental periods</li>
+                  <li>review summaries occasionally</li>
+                  <li>hand their accountant a clean export pack</li>
+                </ul>
+                <p>Instead of scrambling once a year, they spread the work across twelve months.</p>
+                <p className="font-semibold text-slate-900">That single change removes most of the stress.</p>
+              </div>
+            </div>
+
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">What Northfile Is Building for Ontario Landlords</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>Northfile is designed specifically for Ontario rental compliance.</p>
+                <p>Instead of scattered spreadsheets, Northfile helps landlords:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>track multiple properties in one place</li>
+                  <li>categorize transactions using tax-ready categories</li>
+                  <li>upload and match receipts</li>
+                  <li>manage co-ownership correctly</li>
+                  <li>split partial-year rentals</li>
+                  <li>estimate mortgage interest during the year</li>
+                  <li>reconcile official lender statements at filing time</li>
+                  <li>generate draft T776 forms</li>
+                  <li>prepare accountant-ready export packs</li>
+                  <li>generate Ontario rent notices like N1 and N4</li>
+                </ul>
+                <div className="bg-gradient-to-r from-slate-100 to-slate-200/50 border-l-4 border-slate-600 p-6 my-8 rounded-r-lg shadow-sm">
+                  <p className="font-bold text-slate-900 mb-3">Our focus is simple:</p>
+                  <ul className="space-y-2 text-slate-800">
+                    <li>👉 reduce year-end chaos</li>
+                    <li>👉 prevent costly mistakes</li>
+                    <li>👉 make working with your accountant effortless</li>
                   </ul>
                 </div>
               </div>
             </div>
 
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">7. Professional Fees</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              You can deduct fees paid to professionals for rental-related services:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li>Accountant fees for preparing your T776 form</li>
-              <li>Legal fees for lease preparation or tenant disputes</li>
-              <li>Property management fees (typically 8-10% of rent)</li>
-              <li>Real estate agent fees for finding tenants</li>
-            </ul>
-
-            <h3 className="text-2xl font-bold text-slate-900 mt-8 mb-4">8. Office Expenses</h3>
-            <p className="text-slate-700 leading-relaxed mb-4">
-              Small office expenses related to managing your rental property:
-            </p>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li>Stationery and postage</li>
-              <li>Accounting software (like Northfile!)</li>
-              <li>Mileage for property-related trips</li>
-              <li>Phone calls related to the rental</li>
-            </ul>
-
-            <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">What You CANNOT Deduct</h2>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700 mb-6">
-              <li><strong>Mortgage principal payments</strong> - Only interest is deductible</li>
-              <li><strong>Land transfer tax</strong> - This is a capital cost, not an expense</li>
-              <li><strong>Personal expenses</strong> - Even if you visit the property</li>
-              <li><strong>Capital improvements</strong> - Must be claimed as CCA over time</li>
-              <li><strong>Fines and penalties</strong> - Late payment penalties to CRA are not deductible</li>
-            </ul>
-
-            <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">How to Track Your Deductions</h2>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              The CRA requires you to keep all receipts and supporting documents for at least 6 years. Here's how to stay organized:
-            </p>
-
-            <div className="bg-green-50 border-2 border-green-300 rounded-xl p-6 my-8">
-              <h3 className="text-xl font-bold text-green-900 mb-4">✓ Best Practices</h3>
-              <ol className="list-decimal pl-6 space-y-3 text-green-800">
-                <li><strong>Use dedicated software</strong> - Tools like Northfile automatically categorize expenses to CRA lines</li>
-                <li><strong>Keep digital copies</strong> - Scan or photograph all receipts immediately</li>
-                <li><strong>Separate accounts</strong> - Use a dedicated bank account for rental income and expenses</li>
-                <li><strong>Track mileage</strong> - Keep a log of property-related trips with dates and purposes</li>
-                <li><strong>Document everything</strong> - Write notes on receipts explaining the business purpose</li>
-              </ol>
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">Who Northfile Is For</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>Northfile is built for:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Ontario landlords with growing portfolios</li>
+                  <li>condo investors</li>
+                  <li>co-owned properties</li>
+                  <li>people who hate spreadsheets</li>
+                  <li>landlords who work with accountants</li>
+                  <li>anyone tired of tax-season panic</li>
+                </ul>
+                <p>If your rentals are starting to feel complicated, that's usually the moment software begins paying for itself.</p>
+              </div>
             </div>
 
-            <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">Filing Your T776 Form</h2>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              All rental income and expenses are reported on Form T776 (Statement of Real Estate Rentals), which you file with your personal tax return. 
-              The form has specific lines for each expense category, and the CRA expects you to categorize expenses correctly.
-            </p>
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">Get Ready Before Tax Season Hits</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>Tax deadlines don't move.</p>
+                <p>The landlords who feel prepared in April usually started organizing long before then.</p>
+                <p>If you'd like to see what an Ontario-specific T776 workflow looks like, you can visit Northfile.ca and join the Ontario launch cohort.</p>
+                <p>Early users get priority access as we roll out province-by-province.</p>
+              </div>
+            </div>
 
-            <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 my-8">
-              <h3 className="text-xl font-bold text-blue-900 mb-3">🚀 Simplify Your Filing with Northfile</h3>
-              <p className="text-blue-800 mb-4">
-                Northfile automatically categorizes your rental expenses to the correct T776 lines, tracks receipts, 
-                and generates draft forms ready for your accountant. Try it free for 30 days.
+            <div className="border-t-2 border-slate-200 pt-10">
+              <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-6">Final Thought</h2>
+              <div className="space-y-5 text-lg text-slate-700 leading-relaxed">
+                <p>Spreadsheets aren't wrong.</p>
+                <p>They're just fragile.</p>
+                <p>Once rental portfolios involve co-owners, renovations, refinancing, or multiple properties, having a system built specifically for Ontario compliance can save time, money, and a lot of stress.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Waitlist CTA */}
+          <div className="mt-20 border-t-2 border-slate-200 pt-16">
+            <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl p-10 md:p-12 shadow-xl border border-blue-200/60 text-center">
+              <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-4">
+                Ready to Simplify Your Rental Taxes?
+              </h3>
+              <p className="text-lg text-slate-600 leading-relaxed mb-8 max-w-2xl mx-auto">
+                Join 200+ Ontario landlords on the waitlist. Be the first to experience Northfile when we launch in Q2 2026.
               </p>
-              <Link href="/auth/signup" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                Start Free Trial
+              <Link
+                href="/#waitlist"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-10 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
+              >
+                Join the Waitlist
+                <ArrowRight className="w-5 h-5" />
               </Link>
-            </div>
-
-            <h2 className="text-3xl font-bold text-slate-900 mt-12 mb-6">Conclusion</h2>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              Understanding and properly claiming all eligible deductions can save you thousands of dollars in taxes each year. 
-              Keep detailed records, categorize expenses correctly, and consider using software to automate the tracking process.
-            </p>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              Remember: when in doubt, consult with a qualified accountant or tax professional who specializes in rental property taxation.
-            </p>
-          </div>
-
-          {/* Author Bio */}
-          <div className="border-t-2 border-slate-200 mt-12 pt-8">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
-                NF
-              </div>
-              <div>
-                <h3 className="font-bold text-slate-900 mb-1">Northfile Team</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Our team of tax professionals and software engineers is dedicated to simplifying tax compliance for Ontario landlords. 
-                  We stay up-to-date with CRA regulations to provide accurate, actionable guidance.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Share Section */}
-          <div className="border-t-2 border-slate-200 mt-8 pt-8">
-            <p className="text-sm font-semibold text-slate-700 mb-4">Share this article:</p>
-            <div className="flex gap-3">
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-                Twitter
-              </button>
-              <button className="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white rounded-lg font-semibold transition-colors">
-                LinkedIn
-              </button>
-              <button className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-semibold transition-colors">
-                Email
-              </button>
+              <p className="text-sm text-slate-500 mt-6">
+                ✓ No payment required • ✓ Early access pricing • ✓ Cancel anytime
+              </p>
             </div>
           </div>
         </div>
       </article>
-
-      {/* Related Articles */}
-      <section className="bg-slate-100 py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8">Related Articles</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "How to Fill Out Form T776: Complete Guide",
-                category: "Tax Forms",
-                readTime: "12 min read",
-              },
-              {
-                title: "Understanding Capital Cost Allowance (CCA)",
-                category: "Tax Strategy",
-                readTime: "10 min read",
-              },
-              {
-                title: "Rental Expense Categories: CRA Guidelines",
-                category: "Tax Tips",
-                readTime: "9 min read",
-              },
-            ].map((article, index) => (
-              <Link
-                key={index}
-                href="/blog/sample"
-                className="bg-white rounded-xl p-6 hover:shadow-lg transition-shadow border border-slate-200"
-              >
-                <span className="text-xs font-semibold text-blue-600 mb-2 block">{article.category}</span>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 hover:text-blue-600 transition-colors">
-                  {article.title}
-                </h3>
-                <p className="text-sm text-slate-500">{article.readTime}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-4">Ready to Simplify Your Tax Filing?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join hundreds of Ontario landlords using Northfile to automate their T776 preparation.
-          </p>
-          <Link href="/auth/signup" className="inline-block bg-white hover:bg-slate-100 text-blue-600 px-8 py-4 rounded-lg font-bold text-lg transition-colors">
-            Start Free Trial
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

@@ -1,96 +1,58 @@
 import { Calendar, Clock, ArrowRight, Tag } from "lucide-react";
 import Link from "next/link";
+import { getPublishedPosts, getCategories } from "@/lib/blog-data";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog - Ontario Landlord Tax & Compliance Resources | Northfile",
+  description: "Expert guides on T776 forms, rental tax deductions, CRA compliance, and landlord best practices for Ontario property owners.",
+  keywords: "Ontario landlord blog, T776 guide, rental tax tips, CRA compliance, landlord resources",
+  openGraph: {
+    title: "Northfile Blog - Ontario Landlord Resources",
+    description: "Expert guides on T776 forms, rental tax deductions, and landlord compliance for Ontario property owners.",
+    url: "https://northfile.ca/blog",
+    siteName: "Northfile",
+    type: "website",
+    locale: "en_CA",
+  },
+  alternates: {
+    canonical: "https://northfile.ca/blog",
+  },
+};
 
 export default function BlogPage() {
-  const posts = [
-    {
-      slug: "landlord-tax-deductions-ontario-2024",
-      title: "Complete Guide to Landlord Tax Deductions in Ontario (2024)",
-      excerpt: "Maximize your rental property deductions with this comprehensive guide to CRA-approved expenses for Ontario landlords.",
-      category: "Tax Tips",
-      date: "February 1, 2024",
-      readTime: "8 min read",
-      image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=400&fit=crop",
-    },
-    {
-      slug: "t776-form-guide-rental-income",
-      title: "How to Fill Out Form T776: Statement of Real Estate Rentals",
-      excerpt: "Step-by-step walkthrough of completing your T776 form, including common mistakes to avoid and line-by-line explanations.",
-      category: "Tax Forms",
-      date: "January 28, 2024",
-      readTime: "12 min read",
-      image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=400&fit=crop",
-    },
-    {
-      slug: "capital-cost-allowance-rental-property",
-      title: "Understanding Capital Cost Allowance (CCA) for Rental Properties",
-      excerpt: "Learn when to claim CCA, how to calculate it, and why you might want to avoid claiming it on your rental property.",
-      category: "Tax Strategy",
-      date: "January 25, 2024",
-      readTime: "10 min read",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=400&fit=crop",
-    },
-    {
-      slug: "ontario-rta-notice-requirements",
-      title: "Ontario RTA Notice Requirements: N1, N4, and More",
-      excerpt: "Complete guide to serving legal notices to tenants in Ontario, including timelines, formats, and common pitfalls.",
-      category: "Landlord Law",
-      date: "January 22, 2024",
-      readTime: "7 min read",
-      image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=400&fit=crop",
-    },
-    {
-      slug: "rental-expense-categories-cra",
-      title: "Rental Expense Categories: What the CRA Allows You to Deduct",
-      excerpt: "Detailed breakdown of all CRA-approved rental expense categories with real-world examples and documentation requirements.",
-      category: "Tax Tips",
-      date: "January 18, 2024",
-      readTime: "9 min read",
-      image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=400&fit=crop",
-    },
-    {
-      slug: "organizing-rental-receipts-cra-audit",
-      title: "How to Organize Rental Receipts for CRA Audits",
-      excerpt: "Best practices for receipt management, digital storage, and what documentation the CRA requires during an audit.",
-      category: "Record Keeping",
-      date: "January 15, 2024",
-      readTime: "6 min read",
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&h=400&fit=crop",
-    },
-  ];
+  const posts = getPublishedPosts();
 
   const categories = ["All Posts", "Tax Tips", "Tax Forms", "Tax Strategy", "Landlord Law", "Record Keeping"];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="text-3xl font-light text-slate-900" style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '-0.02em' }}>
               Northfile
             </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900">Dashboard</Link>
-              <Link href="/properties" className="text-sm font-medium text-slate-600 hover:text-slate-900">Properties</Link>
+              <Link href="/" className="text-sm font-medium text-slate-600 hover:text-slate-900">Home</Link>
               <Link href="/blog" className="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-1">Blog</Link>
+              <Link href="/faq" className="text-sm font-medium text-slate-600 hover:text-slate-900">FAQ</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/auth/login" className="text-sm font-medium text-slate-600 hover:text-slate-900">Sign In</Link>
-            <Link href="/auth/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-              Get Started
-            </Link>
+            {/* Blog-focused navigation - no product CTAs */}
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
+        <div className="max-w-7xl mx-auto px-6 relative">
           <div className="max-w-3xl">
-            <h1 className="text-5xl font-bold mb-6">Northfile Blog</h1>
-            <p className="text-xl text-blue-100 leading-relaxed">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">Northfile Blog</h1>
+            <p className="text-xl text-blue-50 mb-10 leading-relaxed">
               Tax tips, landlord guides, and rental property insights for Ontario property owners. 
               Learn how to maximize deductions, stay compliant, and simplify your tax filing.
             </p>
@@ -123,7 +85,7 @@ export default function BlogPage() {
         {/* Featured Post */}
         <div className="mb-16">
           <p className="text-sm font-semibold text-blue-600 mb-4 uppercase tracking-wide">Featured Article</p>
-          <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-slate-200 hover:shadow-2xl transition-shadow">
+          <div className="bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-200/60 hover:shadow-3xl transition-all hover:-translate-y-1 duration-300">
             <div className="grid md:grid-cols-2 gap-0">
               <div className="relative h-80 md:h-auto">
                 <img
@@ -132,7 +94,7 @@ export default function BlogPage() {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold shadow-lg">
                     {posts[0].category}
                   </span>
                 </div>
@@ -148,7 +110,7 @@ export default function BlogPage() {
                     <span>{posts[0].readTime}</span>
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900 mb-4 leading-tight">
+                <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-4 leading-tight">
                   {posts[0].title}
                 </h2>
                 <p className="text-lg text-slate-600 mb-6 leading-relaxed">
@@ -156,10 +118,10 @@ export default function BlogPage() {
                 </p>
                 <Link
                   href={`/blog/${posts[0].slug}`}
-                  className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:gap-3 transition-all group"
                 >
                   Read Full Article
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
@@ -172,7 +134,7 @@ export default function BlogPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200 hover:shadow-2xl transition-shadow group"
+              className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200/60 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group"
             >
               <div className="relative h-48 overflow-hidden">
                 <img
@@ -181,7 +143,7 @@ export default function BlogPage() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-4 left-4">
-                  <span className="bg-white/90 backdrop-blur-sm text-slate-900 px-3 py-1 rounded-full text-xs font-semibold">
+                  <span className="bg-white/95 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-xs font-semibold shadow-md">
                     {post.category}
                   </span>
                 </div>
@@ -214,32 +176,30 @@ export default function BlogPage() {
         </div>
 
         {/* Load More */}
-        <div className="mt-12 text-center">
-          <button className="border-2 border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-3 rounded-lg font-semibold transition-colors">
+        <div className="mt-16 text-center">
+          <button className="border-2 border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-slate-700 px-10 py-3.5 rounded-lg font-semibold transition-all shadow-sm hover:shadow">
             Load More Articles
           </button>
         </div>
       </main>
 
-      {/* Newsletter CTA */}
-      <section className="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-4">Stay Updated</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Get the latest tax tips and landlord guides delivered to your inbox every week.
+      {/* Waitlist CTA */}
+      <section className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)]"></div>
+        <div className="max-w-4xl mx-auto px-6 text-center relative">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 drop-shadow-lg">Ready to Simplify Your Rental Taxes?</h2>
+          <p className="text-xl text-blue-50 leading-relaxed mb-10 max-w-2xl mx-auto">
+            Join 200+ Ontario landlords on the waitlist. Be the first to experience Northfile when we launch in Q2 2026.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-6 py-4 rounded-lg text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-300"
-            />
-            <button className="bg-white hover:bg-slate-100 text-blue-600 px-8 py-4 rounded-lg font-semibold transition-colors whitespace-nowrap">
-              Subscribe
-            </button>
-          </div>
-          <p className="text-sm text-blue-200 mt-4">
-            No spam. Unsubscribe anytime.
+          <Link
+            href="/#waitlist"
+            className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-blue-600 px-10 py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
+          >
+            Join the Waitlist
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <p className="text-sm text-blue-100 mt-6">
+            ✓ No payment required • ✓ Early access pricing • ✓ Cancel anytime
           </p>
         </div>
       </section>
@@ -255,21 +215,17 @@ export default function BlogPage() {
               </p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/properties" className="hover:text-white">Properties</Link></li>
-                <li><Link href="/transactions" className="hover:text-white">Transactions</Link></li>
-                <li><Link href="/receipts" className="hover:text-white">Receipts</Link></li>
-                <li><Link href="/reports" className="hover:text-white">Reports</Link></li>
-              </ul>
-            </div>
-            <div>
               <h4 className="text-white font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
-                <li><Link href="/guides" className="hover:text-white">Guides</Link></li>
                 <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
-                <li><Link href="/support" className="hover:text-white">Support</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-semibold mb-4">About</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/" className="hover:text-white">Home</Link></li>
+                <li><Link href="/#features" className="hover:text-white">Features</Link></li>
               </ul>
             </div>
             <div>

@@ -1,4 +1,5 @@
 import { ArrowRight, FileText, Users, Shield, Download, CheckCircle, Building2, Zap, Clock, Lock } from "lucide-react";
+import Link from "next/link";
 import TypewriterText from "@/components/TypewriterText";
 
 export default function Home() {
@@ -46,10 +47,10 @@ export default function Home() {
             <p className="text-2xl text-slate-200 mb-12 leading-relaxed">
               Organize rental finances, categorize expenses to CRA lines, and generate draft T776 forms - all in one powerful platform built for Ontario landlords.
             </p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-semibold text-lg inline-flex items-center gap-3 transition-all shadow-lg hover:shadow-xl">
+            <Link href="/auth/signup" className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-semibold text-lg inline-flex items-center gap-3 transition-all shadow-lg hover:shadow-xl">
               Get Started • it's free
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -481,9 +482,9 @@ export default function Home() {
           <p className="text-2xl text-blue-100 mb-12">
             Join 200+ landlords preparing for Q2 2026 launch
           </p>
-          <button className="bg-white text-blue-600 px-12 py-6 rounded-full font-bold text-xl hover:bg-blue-50 transition-all shadow-xl">
+          <Link href="/auth/signup" className="bg-white text-blue-600 px-12 py-6 rounded-full font-bold text-xl hover:bg-blue-50 transition-all shadow-xl">
             Get Started • it's free
-          </button>
+          </Link>
         </div>
       </section>
 

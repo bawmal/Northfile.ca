@@ -1,25 +1,238 @@
-import { Upload, Filter, Grid3x3, List, CheckCircle, AlertCircle, Clock, Sparkles, Eye, Link2, Trash2, FileText } from "lucide-react";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { 
+  Upload, 
+  FileText, 
+  Image as ImageIcon, 
+  Search, 
+  Filter, 
+  Eye, 
+  Download, 
+  Trash2, 
+  Archive, 
+  CheckCircle, 
+  AlertCircle, 
+  Clock, 
+  X, 
+  Camera, 
+  Zap,
+  Target,
+  Archive as ArchiveIcon
+} from 'lucide-react';
+import Link from 'next/link';
+
+interface Receipt {
+  id: string;
+  fileName: string;
+  fileType: 'pdf' | 'image';
+  fileSize: number;
+  uploadDate: string;
+  propertyId?: string;
+  propertyAddress?: string;
+  category?: string;
+  ocrData?: {
+    vendor?: string;
+    date?: string;
+    amount?: number;
+    description?: string;
+    confidence?: number;
+  };
+  matchedTransactionId?: string;
+  matchedTransactionDescription?: string;
+  status: 'processing' | 'ready' | 'matched' | 'archived';
+  retentionYears: number;
+}
 
 export default function ReceiptsPage() {
+  const [receipts, setReceipts] = useState<Receipt[]>([
+    {
+      id: 'receipt_1',
+      fileName: 'home_depot_receipt.pdf',
+      fileType: 'pdf',
+      fileSize: 245760,
+      uploadDate: '2025-01-14',
+      propertyId: 'prop_1',
+      propertyAddress: '123 Main Street, Toronto',
+      category: 'Repairs & Maintenance',
+      ocrData: {
+        vendor: 'Home Depot',
+        date: '2025-01-14',
+        amount: 1250.00,
+        description: 'Renovation supplies and tools',
+        confidence: 0.95
+      },
+      matchedTransactionId: 'txn_1',
+      matchedTransactionDescription: 'Home Depot - Renovation supplies',
+      status: 'matched',
+      retentionYears: 7
+    },
+    {
+      id: 'receipt_2',
+      fileName: 'city_tax_bill.jpg',
+      fileType: 'image',
+      fileSize: 1024000,
+      uploadDate: '2025-01-10',
+      propertyId: 'prop_2',
+      propertyAddress: '456 Elm Avenue, Toronto',
+      category: 'Property Tax',
+      ocrData: {
+        vendor: 'City of Toronto',
+        date: '2025-01-10',
+        amount: 3500.00,
+        description: 'Annual property tax bill',
+        confidence: 0.88
+      },
+      status: 'ready',
+      retentionYears: 7
+    },
+    {
+      id: 'receipt_3',
+      fileName: 'insurance_premium.pdf',
+      fileType: 'pdf',
+      fileSize: 512000,
+      uploadDate: '2025-01-08',
+      propertyId: 'prop_3',
+      propertyAddress: '789 Oak Road, Mississauga',
+      category: 'Insurance',
+      ocrData: {
+        vendor: 'State Farm Insurance',
+        date: '2025-01-08',
+        amount: 1800.00,
+        description: 'Annual property insurance premium',
+        confidence: 0.92
+      },
+      status: 'ready',
+      retentionYears: 7
+    }
+  ]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedProperty, setSelectedProperty] = useState('all');
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [viewingReceipt, setViewingReceipt] = useState<Receipt | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const categories = ['all', 'Repairs & Maintenance', 'Property Tax', 'Insurance', 'Utilities', 'Other'];
+  const properties = ['all', '123 Main Street, Toronto', '456 Elm Avenue, Toronto', '789 Oak Road, Mississauga'];
+
+  const filteredReceipts = receipts.filter(receipt => {
+    const matchesSearch = searchTerm === '' || 
+      receipt.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      receipt.ocrData?.vendor?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      receipt.matchedTransactionDescription?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = selectedCategory === 'all' || receipt.category === selectedCategory;
+    const matchesProperty = selectedProperty === 'all' || receipt.propertyAddress === selectedProperty;
+    
+    return matchesSearch && matchesCategory && matchesProperty;
+  });
+
+  const totalReceipts = receipts.length;
+  const matchedReceipts = receipts.filter(r => r.status === 'matched').length;
+  const unmatchedReceipts = receipts.filter(r => r.status === 'ready').length;
+  const totalStorage = receipts.reduce((sum, r) => sum + r.fileSize, 0);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-CA', {
+      style: 'currency',
+      currency: 'CAD'
+    }).format(amount);
+  };
+
+  const handleFileUpload = async (files: FileList) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const progress = ((i + 1) / files.length) * 100;
+      setUploadProgress(progress);
+
+      // Simulate OCR processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const newReceipt: Receipt = {
+        id: `receipt_${Date.now()}_${i}`,
+        fileName: file.name,
+        fileType: file.type.includes('pdf') ? 'pdf' : 'image',
+        fileSize: file.size,
+        uploadDate: new Date().toISOString().split('T')[0],
+        ocrData: {
+          vendor: ['Home Depot', 'Canadian Tire', 'Lowe\'s', 'City of Toronto', 'Enbridge'][Math.floor(Math.random() * 5)],
+          date: new Date().toISOString().split('T')[0],
+          amount: Math.random() * 1000 + 50,
+          description: 'Automatically extracted from receipt',
+          confidence: 0.85 + Math.random() * 0.15
+        },
+        status: 'ready',
+        retentionYears: 7
+      };
+
+      setReceipts(prev => [...prev, newReceipt]);
+    }
+
+    setIsUploading(false);
+    setUploadProgress(0);
+    setShowUploadModal(false);
+  };
+
+  const handleMatchReceipt = (receiptId: string) => {
+    setReceipts(prev => prev.map(receipt => 
+      receipt.id === receiptId
+        ? {
+            ...receipt,
+            status: 'matched' as const,
+            matchedTransactionId: `txn_${Date.now()}`,
+            matchedTransactionDescription: 'Matched transaction'
+          }
+        : receipt
+    ));
+  };
+
+  const handleArchiveReceipt = (receiptId: string) => {
+    setReceipts(prev => prev.map(receipt => 
+      receipt.id === receiptId
+        ? { ...receipt, status: 'archived' as const }
+        : receipt
+    ));
+  };
+
+  const handleDeleteReceipt = (receiptId: string) => {
+    if (confirm('Are you sure you want to delete this receipt?')) {
+      setReceipts(prev => prev.filter(receipt => receipt.id !== receiptId));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <span className="text-3xl font-light text-slate-900" style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '-0.02em' }}>
-              Northfile
-            </span>
+            <Link href="/dashboard" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
+              <span className="text-3xl font-light text-slate-900" style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '-0.02em' }}>
+                Northfile
+              </span>
+            </Link>
             <nav className="hidden md:flex items-center gap-6">
-              <a href="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900">Dashboard</a>
-              <a href="/properties" className="text-sm font-medium text-slate-600 hover:text-slate-900">Properties</a>
-              <a href="/transactions" className="text-sm font-medium text-slate-600 hover:text-slate-900">Transactions</a>
-              <a href="/receipts" className="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-1">Receipts</a>
-              <a href="/reports" className="text-sm font-medium text-slate-600 hover:text-slate-900">Reports</a>
+              <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 transition-colors">Dashboard</Link>
+              <Link href="/properties" className="text-slate-600 hover:text-slate-900 transition-colors">Properties</Link>
+              <Link href="/transactions" className="text-slate-600 hover:text-slate-900 transition-colors">Transactions</Link>
+              <Link href="/receipts" className="text-blue-600 font-medium">Receipts</Link>
+              <Link href="/mortgages" className="text-slate-600 hover:text-slate-900 transition-colors">Mortgages</Link>
+              <Link href="/reports" className="text-slate-600 hover:text-slate-900 transition-colors">Reports</Link>
             </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">JL</div>
           </div>
         </div>
       </header>
@@ -27,567 +240,523 @@ export default function ReceiptsPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Receipts</h1>
-          <p className="text-slate-500 text-lg">Upload and organize your expense receipts</p>
-        </div>
-
-        {/* Record Retention Guidance */}
-        <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 mb-8">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <FileText className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-bold text-blue-900 mb-2">📋 CRA Record Retention Requirements</h3>
-              <p className="text-sm text-blue-800 mb-4">
-                The Canada Revenue Agency requires you to keep all supporting documents for <span className="font-bold">6 years</span> after filing your tax return.
-              </p>
-              
-              <div className="bg-white rounded-lg p-4 mb-4">
-                <p className="text-sm font-semibold text-slate-900 mb-3">What to keep for each expense:</p>
-                <div className="grid md:grid-cols-2 gap-3 text-sm text-slate-700">
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Original receipts or invoices</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Bank statements showing payment</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Credit card statements</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Cancelled cheques or e-transfer confirmations</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Contracts or agreements</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Property tax bills</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Insurance policy documents</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-green-600 font-bold">✓</span>
-                    <span>Mortgage statements</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
-                <p className="text-sm font-semibold text-green-900 mb-1">✓ Northfile keeps your records safe</p>
-                <p className="text-xs text-green-800">
-                  All receipts uploaded to Northfile are securely stored and backed up. 
-                  You can download them anytime for CRA audits or your records.
-                </p>
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-                <p className="text-sm font-semibold text-yellow-900 mb-1">⚠️ Audit Protection</p>
-                <p className="text-xs text-yellow-800">
-                  If you're audited, the CRA will ask for proof of every expense claimed. 
-                  Missing receipts = disallowed deductions = higher taxes owed + penalties.
-                </p>
-              </div>
-            </div>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">Receipt Vault</h1>
+            <p className="text-slate-500 text-lg">Upload, manage, and match receipts for audit-ready records</p>
           </div>
-        </div>
-
-        {/* Upload Zone */}
-        <div className="bg-white border-2 border-dashed border-slate-300 rounded-2xl p-12 mb-12 text-center hover:border-slate-400 transition-colors cursor-pointer">
-          <div className="max-w-md mx-auto">
-            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">Upload Receipts</h3>
-            <p className="text-slate-500 mb-6">
-              Drag and drop your receipt images or PDFs here, or click to browse
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
-                Choose Files
-              </button>
-              <p className="text-sm text-slate-400">Supports JPG, PNG, PDF</p>
-            </div>
-            <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-500">
-              <Sparkles className="w-4 h-4" />
-              <span>AI will automatically extract data and match to transactions</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats & Actions Bar */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-2xl p-6 border border-slate-200">
-            <p className="text-sm text-slate-500 mb-2">Total Receipts</p>
-            <p className="text-3xl font-bold text-slate-900">189</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200">
-            <p className="text-sm text-slate-500 mb-2">Auto-Matched</p>
-            <p className="text-3xl font-bold text-green-600">142</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200">
-            <p className="text-sm text-slate-500 mb-2">Pending Review</p>
-            <p className="text-3xl font-bold text-yellow-600">38</p>
-          </div>
-          <div className="bg-white rounded-2xl p-6 border border-slate-200">
-            <p className="text-sm text-slate-500 mb-2">Unmatched</p>
-            <p className="text-3xl font-bold text-orange-600">9</p>
-          </div>
-        </div>
-
-        {/* Filters & View Toggle */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button className="border-2 border-slate-200 hover:border-slate-300 text-slate-700 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                Filters
-              </button>
-              <select className="px-4 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                <option>All Status</option>
-                <option>Auto-Matched</option>
-                <option>Pending Review</option>
-                <option>Unmatched</option>
-              </select>
-              <select className="px-4 py-2 border-2 border-slate-200 rounded-lg focus:border-blue-500 focus:outline-none">
-                <option>All Properties</option>
-                <option>123 Main St</option>
-                <option>456 Oak Ave</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                <Grid3x3 className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-slate-100 text-slate-600 rounded-lg">
-                <List className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Multi-Receipt Matching Review */}
-        <div className="bg-white rounded-xl border-2 border-purple-200 overflow-hidden mb-6">
-          <div className="bg-purple-50 p-6 border-b-2 border-purple-200">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-purple-900 mb-1">Split Payment Detected</h3>
-                <p className="text-purple-700">
-                  AI found 2 receipts that total $5,000 matching a single transaction. Review and confirm the match.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {/* Transaction Being Matched */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
-              <p className="text-xs font-semibold text-blue-600 mb-2">MATCHING TO TRANSACTION:</p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-bold text-slate-900">Appliance Purchase - Home Depot</p>
-                  <p className="text-sm text-slate-600">Jan 15, 2025 • 123 Main St</p>
-                </div>
-                <p className="text-2xl font-bold text-blue-600">$5,000.00</p>
-              </div>
-            </div>
-
-            {/* Suggested Receipt Matches */}
-            <div className="space-y-4 mb-6">
-              <p className="text-sm font-semibold text-slate-900">Suggested Receipts (2):</p>
-              
-              {/* Receipt 1 */}
-              <div className="flex items-start gap-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
-                <input type="checkbox" defaultChecked className="mt-1 w-5 h-5 text-green-600 border-slate-300 rounded" />
-                <div className="w-20 h-24 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=200&h=300&fit=crop" 
-                    alt="Receipt"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-semibold text-slate-900">Credit Card Payment</p>
-                      <p className="text-sm text-slate-600">Home Depot • Jan 15, 2025</p>
-                      <p className="text-xs text-slate-500 mt-1">Card ending ****1234</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-green-700">$2,500.00</p>
-                      <span className="inline-block mt-1 text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                        95% Match
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-green-700">
-                    <CheckCircle className="w-4 h-4" />
-                    <span>Same merchant • Same date • Amount matches 50% of transaction</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Receipt 2 */}
-              <div className="flex items-start gap-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
-                <input type="checkbox" defaultChecked className="mt-1 w-5 h-5 text-green-600 border-slate-300 rounded" />
-                <div className="w-20 h-24 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=200&h=300&fit=crop" 
-                    alt="Receipt"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-semibold text-slate-900">Debit Card Payment</p>
-                      <p className="text-sm text-slate-600">Home Depot • Jan 15, 2025</p>
-                      <p className="text-xs text-slate-500 mt-1">Card ending ****5678</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-green-700">$2,500.00</p>
-                      <span className="inline-block mt-1 text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                        95% Match
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-green-700">
-                    <CheckCircle className="w-4 h-4" />
-                    <span>Same merchant • Same date • Amount matches 50% of transaction</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Match Summary */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-slate-600">Transaction Amount:</span>
-                <span className="font-semibold text-slate-900">$5,000.00</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-slate-600">Selected Receipts Total:</span>
-                <span className="font-semibold text-slate-900">$2,500 + $2,500 = $5,000.00</span>
-              </div>
-              <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-300">
-                <span className="font-semibold text-slate-900">Match Status:</span>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="font-bold text-green-600">Perfect Match ✓</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                Accept Match (2 Receipts)
-              </button>
-              <button className="px-6 py-3 border-2 border-slate-200 hover:border-slate-300 text-slate-700 rounded-lg font-semibold transition-colors">
-                Review Individually
-              </button>
-              <button className="px-6 py-3 border-2 border-red-200 hover:border-red-300 text-red-600 rounded-lg font-semibold transition-colors">
-                Reject
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Match Suggestion - Partial Payments */}
-        <div className="bg-white rounded-xl border-2 border-yellow-200 overflow-hidden mb-6">
-          <div className="bg-yellow-50 p-6 border-b-2 border-yellow-200">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-yellow-900 mb-1">Partial Payment Series Detected</h3>
-                <p className="text-yellow-700">
-                  AI found 3 receipts over 2 months that may match this contractor payment. Review timeline.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-6">
-            {/* Transaction Being Matched */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
-              <p className="text-xs font-semibold text-blue-600 mb-2">MATCHING TO TRANSACTION:</p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-bold text-slate-900">Contractor Payment - ABC Renovations</p>
-                  <p className="text-sm text-slate-600">Mar 5, 2025 • 123 Main St</p>
-                </div>
-                <p className="text-2xl font-bold text-blue-600">$10,000.00</p>
-              </div>
-            </div>
-
-            {/* Timeline of Receipts */}
-            <div className="space-y-3 mb-6">
-              <p className="text-sm font-semibold text-slate-900">Suggested Receipt Timeline (3):</p>
-              
-              <div className="flex items-start gap-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <input type="checkbox" defaultChecked className="mt-1 w-4 h-4 text-yellow-600 border-slate-300 rounded" />
-                <div className="flex-1 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-900 text-sm">Deposit Payment</p>
-                    <p className="text-xs text-slate-600">Jan 15, 2025 • E-Transfer</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-yellow-700">$3,000</p>
-                    <span className="text-xs text-yellow-600">30%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <input type="checkbox" defaultChecked className="mt-1 w-4 h-4 text-yellow-600 border-slate-300 rounded" />
-                <div className="flex-1 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-900 text-sm">Progress Payment</p>
-                    <p className="text-xs text-slate-600">Feb 10, 2025 • Cheque #1234</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-yellow-700">$4,000</p>
-                    <span className="text-xs text-yellow-600">40%</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <input type="checkbox" defaultChecked className="mt-1 w-4 h-4 text-yellow-600 border-slate-300 rounded" />
-                <div className="flex-1 flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-900 text-sm">Final Payment</p>
-                    <p className="text-xs text-slate-600">Mar 5, 2025 • E-Transfer</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-yellow-700">$3,000</p>
-                    <span className="text-xs text-yellow-600">30%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Match Summary */}
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-slate-600">Transaction Amount:</span>
-                <span className="font-semibold text-slate-900">$10,000.00</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-slate-600">Selected Receipts Total:</span>
-                <span className="font-semibold text-slate-900">$3,000 + $4,000 + $3,000 = $10,000.00</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-slate-600">Date Range:</span>
-                <span className="font-semibold text-slate-900">Jan 15 - Mar 5 (50 days)</span>
-              </div>
-              <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-300">
-                <span className="font-semibold text-slate-900">Match Status:</span>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <span className="font-bold text-green-600">Perfect Match ✓</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                Accept Match (3 Receipts)
-              </button>
-              <button className="px-6 py-3 border-2 border-slate-200 hover:border-slate-300 text-slate-700 rounded-lg font-semibold transition-colors">
-                Review Timeline
-              </button>
-              <button className="px-6 py-3 border-2 border-red-200 hover:border-red-300 text-red-600 rounded-lg font-semibold transition-colors">
-                Reject
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Receipts Grid */}
-        <div className="grid md:grid-cols-4 gap-6">
-          {/* Receipt Card 1 - Auto-Matched */}
-          <div className="bg-white rounded-xl border-2 border-green-200 overflow-hidden hover:shadow-lg transition-shadow group">
-            <div className="relative aspect-[3/4] bg-slate-100">
-              <img 
-                src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=600&fit=crop" 
-                alt="Receipt"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-3 right-3 flex gap-2">
-                <div className="bg-green-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3" />
-                  Matched
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <button className="bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  View
-                </button>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="font-semibold text-slate-900">Home Depot</p>
-                  <p className="text-sm text-slate-600">Jan 15, 2025</p>
-                </div>
-                <p className="font-bold text-slate-900">$342.50</p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">
-                <Link2 className="w-4 h-4" />
-                <span className="flex-1 truncate">Plumbing Supplies</span>
-              </div>
-              <div className="mt-3 flex gap-2">
-                <button className="flex-1 text-sm font-semibold text-slate-600 hover:text-slate-900 py-2">
-                  View Details
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Receipt Card 2 - Pending Match */}
-          <div className="bg-white rounded-xl border-2 border-yellow-200 overflow-hidden hover:shadow-lg transition-shadow group">
-            <div className="relative aspect-[3/4] bg-slate-100">
-              <img 
-                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=600&fit=crop" 
-                alt="Receipt"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-3 right-3 flex gap-2">
-                <div className="bg-yellow-500 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  92%
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <button className="bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  View
-                </button>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="font-semibold text-slate-900">Enbridge Gas</p>
-                  <p className="text-sm text-slate-600">Jan 12, 2025</p>
-                </div>
-                <p className="font-bold text-slate-900">$156.78</p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded-lg mb-3">
-                <Clock className="w-4 h-4" />
-                <span className="flex-1 truncate">Suggested: Gas Bill</span>
-              </div>
-              <div className="flex gap-2">
-                <button className="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 rounded-lg transition-colors">
-                  Accept
-                </button>
-                <button className="px-3 border-2 border-slate-200 hover:border-slate-300 text-slate-600 rounded-lg transition-colors">
-                  <Eye className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Receipt Card 3 - Unmatched */}
-          <div className="bg-white rounded-xl border-2 border-orange-200 overflow-hidden hover:shadow-lg transition-shadow group">
-            <div className="relative aspect-[3/4] bg-slate-100">
-              <img 
-                src="https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf?w=400&h=600&fit=crop" 
-                alt="Receipt"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute top-3 right-3 flex gap-2">
-                <div className="bg-orange-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  Unmatched
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <button className="bg-white text-slate-900 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                  <Eye className="w-4 h-4" />
-                  View
-                </button>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="font-semibold text-slate-900">ABC Contractors</p>
-                  <p className="text-sm text-slate-600">Jan 10, 2025</p>
-                </div>
-                <p className="font-bold text-slate-900">$2,450.00</p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-orange-700 bg-orange-50 px-3 py-2 rounded-lg mb-3">
-                <AlertCircle className="w-4 h-4" />
-                <span className="flex-1">No match found</span>
-              </div>
-              <div className="flex gap-2">
-                <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2 rounded-lg transition-colors">
-                  Match Manually
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Receipt Card 4 - Processing */}
-          <div className="bg-white rounded-xl border-2 border-blue-200 overflow-hidden hover:shadow-lg transition-shadow group">
-            <div className="relative aspect-[3/4] bg-slate-100">
-              <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-sm font-semibold text-slate-700">Processing OCR...</p>
-                </div>
-              </div>
-              <div className="absolute top-3 right-3 flex gap-2">
-                <div className="bg-blue-600 text-white px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  Processing
-                </div>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="font-semibold text-slate-400">Extracting data...</p>
-                  <p className="text-sm text-slate-400">Just now</p>
-                </div>
-                <p className="font-bold text-slate-400">--</p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-blue-700 bg-blue-50 px-3 py-2 rounded-lg">
-                <Sparkles className="w-4 h-4" />
-                <span className="flex-1">AI analyzing receipt...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Load More */}
-        <div className="mt-8 text-center">
-          <button className="border-2 border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-3 rounded-lg font-semibold transition-colors">
-            Load More Receipts
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            <Upload className="w-5 h-5" />
+            Upload Receipts
           </button>
         </div>
+
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-blue-700">Total Receipts</p>
+              <FileText className="w-5 h-5 text-blue-600" />
+            </div>
+            <p className="text-3xl font-bold text-blue-800 mb-1">{totalReceipts}</p>
+            <p className="text-sm text-blue-600">All receipts</p>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-green-700">Matched</p>
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <p className="text-3xl font-bold text-green-800 mb-1">{matchedReceipts}</p>
+            <p className="text-sm text-green-600">Linked to transactions</p>
+          </div>
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-orange-700">Unmatched</p>
+              <AlertCircle className="w-5 h-5 text-orange-600" />
+            </div>
+            <p className="text-3xl font-bold text-orange-800 mb-1">{unmatchedReceipts}</p>
+            <p className="text-sm text-orange-600">Ready to match</p>
+          </div>
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium text-purple-700">Storage Used</p>
+              <ArchiveIcon className="w-5 h-5 text-purple-600" />
+            </div>
+            <p className="text-3xl font-bold text-purple-800 mb-1">{formatFileSize(totalStorage)}</p>
+            <p className="text-sm text-purple-600">Total file size</p>
+          </div>
+        </div>
+
+        {/* Filters and Search */}
+        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search receipts, vendors, or transactions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>
+                    {category === 'all' ? 'All Categories' : category}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedProperty}
+                onChange={(e) => setSelectedProperty(e.target.value)}
+                className="px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {properties.map(property => (
+                  <option key={property} value={property}>
+                    {property === 'all' ? 'All Properties' : property}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Receipts Table */}
+        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1000px]">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-slate-700 w-[300px]">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        onChange={(e) => {
+                          // Handle select all functionality
+                        }}
+                      />
+                      Receipt Details
+                    </div>
+                  </th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-slate-700 w-[200px]">OCR Data</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-slate-700 w-[180px]">Property</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-slate-700 w-[120px]">Status</th>
+                  <th className="text-left px-6 py-4 text-sm font-medium text-slate-700 w-[100px]">Upload Date</th>
+                  <th className="text-right px-6 py-4 text-sm font-medium text-slate-700 w-[100px]">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {filteredReceipts.map((receipt) => (
+                  <tr key={receipt.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          receipt.fileType === 'pdf' ? 'bg-red-100' : 'bg-green-100'
+                        }`}>
+                          {receipt.fileType === 'pdf' ? (
+                            <FileText className="w-4 h-4 text-red-600" />
+                          ) : (
+                            <ImageIcon className="w-4 h-4 text-green-600" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-slate-900 truncate max-w-[200px]">{receipt.fileName}</p>
+                          <p className="text-sm text-slate-500">{formatFileSize(receipt.fileSize)}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {receipt.ocrData ? (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-slate-900">{receipt.ocrData.vendor}</span>
+                            <span className="text-xs text-slate-500">
+                              {Math.round((receipt.ocrData.confidence || 0) * 100)}%
+                            </span>
+                          </div>
+                          <p className="text-sm text-slate-600">{formatCurrency(receipt.ocrData.amount || 0)}</p>
+                          <p className="text-xs text-slate-500">{receipt.ocrData.date}</p>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-slate-500">No OCR data</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {receipt.propertyAddress ? (
+                        <div>
+                          <p className="text-sm font-medium text-slate-900 truncate max-w-[150px]">{receipt.propertyAddress}</p>
+                          {receipt.category && (
+                            <p className="text-xs text-slate-500">{receipt.category}</p>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-sm text-slate-500">Not assigned</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          receipt.status === 'matched' ? 'bg-green-100 text-green-700' :
+                          receipt.status === 'ready' ? 'bg-orange-100 text-orange-700' :
+                          'bg-slate-100 text-slate-700'
+                        }`}>
+                          {receipt.status === 'matched' ? 'Matched' :
+                           receipt.status === 'ready' ? 'Ready' : 'Archived'}
+                        </span>
+                        {receipt.matchedTransactionDescription && (
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-sm text-slate-900">{receipt.uploadDate}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setViewingReceipt(receipt)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        {receipt.status === 'ready' && (
+                          <button
+                            onClick={() => handleMatchReceipt(receipt.id)}
+                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                        )}
+                        {receipt.status === 'matched' && (
+                          <button
+                            onClick={() => handleArchiveReceipt(receipt.id)}
+                            className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                          >
+                            <Archive className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteReceipt(receipt.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {/* Table Footer with Bulk Actions */}
+          <div className="bg-slate-50 border-t border-slate-200 px-6 py-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-600">
+                Showing {filteredReceipts.length} of {totalReceipts} receipts
+              </p>
+              <div className="flex items-center gap-4">
+                <select className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option>10 per page</option>
+                  <option>25 per page</option>
+                  <option>50 per page</option>
+                  <option>100 per page</option>
+                </select>
+                <div className="flex items-center gap-2">
+                  <button className="px-3 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-100 disabled:opacity-50" disabled>
+                    Previous
+                  </button>
+                  <span className="text-sm text-slate-600">Page 1 of 1</span>
+                  <button className="px-3 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-100 disabled:opacity-50" disabled>
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold mb-1">Upload Receipts</h3>
+                  <p className="text-blue-100">Add receipts for automatic OCR processing and matching</p>
+                </div>
+                <button
+                  onClick={() => setShowUploadModal(false)}
+                  className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                >
+                  <X className="w-6 h-6 text-white" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-8 overflow-y-auto flex-1">
+              {/* Upload Area */}
+              <div className="border-2 border-dashed border-blue-300 bg-blue-50 rounded-2xl p-12 text-center hover:border-blue-400 hover:bg-blue-100 transition-all duration-200">
+                <div className="mb-6">
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Upload className="w-10 h-10 text-blue-600" />
+                  </div>
+                  <h4 className="text-xl font-semibold text-slate-900 mb-2">Drop receipts here</h4>
+                  <p className="text-slate-600 mb-4">or click to browse your files</p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-medium cursor-pointer transition-colors flex items-center gap-2"
+                  >
+                    <Upload className="w-5 h-5" />
+                    Choose Files
+                  </label>
+                  <div className="text-sm text-slate-500">
+                    <span className="font-medium">Supported:</span> PDF, JPG, PNG (Max 10MB)
+                  </div>
+                </div>
+              </div>
+
+              {/* File Types Info */}
+              <div className="grid grid-cols-3 gap-4 mt-8">
+                <div className="text-center p-4 bg-slate-50 rounded-lg">
+                  <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <FileText className="w-6 h-6 text-red-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-900">PDF Documents</p>
+                  <p className="text-xs text-slate-500">Scanned receipts</p>
+                </div>
+                <div className="text-center p-4 bg-slate-50 rounded-lg">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Camera className="w-6 h-6 text-green-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-900">Photos</p>
+                  <p className="text-xs text-slate-500">JPG, PNG images</p>
+                </div>
+                <div className="text-center p-4 bg-slate-50 rounded-lg">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Zap className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-900">OCR Processing</p>
+                  <p className="text-xs text-slate-500">Automatic extraction</p>
+                </div>
+              </div>
+
+              {/* Progress Section */}
+              {isUploading && (
+                <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <Upload className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">Processing Receipts</p>
+                        <p className="text-sm text-slate-600">Extracting data with OCR technology</p>
+                      </div>
+                    </div>
+                    <span className="text-2xl font-bold text-blue-600">{uploadProgress}%</span>
+                  </div>
+                  
+                  <div className="w-full bg-blue-100 rounded-full h-3 mb-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-xs text-slate-600">
+                    <span>Uploading files...</span>
+                    <span>Almost done!</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Features Section */}
+              <div className="mt-8 grid md:grid-cols-2 gap-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900 mb-1">Automatic Data Extraction</p>
+                    <p className="text-sm text-slate-600">OCR extracts vendor, date, amount, and description automatically</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Target className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900 mb-1">Smart Matching</p>
+                    <p className="text-sm text-slate-600">Receipts are automatically matched to existing transactions</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900 mb-1">Fast Processing</p>
+                    <p className="text-sm text-slate-600">Most receipts processed in 2-5 seconds</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <ArchiveIcon className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-slate-900 mb-1">Audit Ready</p>
+                    <p className="text-sm text-slate-600">All receipts stored for 7-year retention compliance</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Receipt View Modal */}
+      {viewingReceipt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-slate-900">{viewingReceipt.fileName}</h3>
+              <button
+                onClick={() => setViewingReceipt(null)}
+                className="p-2 hover:bg-slate-100 rounded-lg"
+              >
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4">Receipt Information</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-slate-600 mb-1">File Name</p>
+                      <p className="font-medium text-slate-900">{viewingReceipt.fileName}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 mb-1">File Type</p>
+                      <p className="font-medium text-slate-900 capitalize">{viewingReceipt.fileType}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 mb-1">File Size</p>
+                      <p className="font-medium text-slate-900">{formatFileSize(viewingReceipt.fileSize)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 mb-1">Upload Date</p>
+                      <p className="font-medium text-slate-900">{viewingReceipt.uploadDate}</p>
+                    </div>
+                    {viewingReceipt.propertyAddress && (
+                      <div>
+                        <p className="text-sm text-slate-600 mb-1">Property</p>
+                        <p className="font-medium text-slate-900">{viewingReceipt.propertyAddress}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4">OCR Extracted Data</h4>
+                  {viewingReceipt.ocrData ? (
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-slate-600 mb-1">Vendor</p>
+                        <p className="font-medium text-slate-900">{viewingReceipt.ocrData.vendor || 'Not detected'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-1">Date</p>
+                        <p className="font-medium text-slate-900">{viewingReceipt.ocrData.date || 'Not detected'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-1">Amount</p>
+                        <p className="font-medium text-slate-900">
+                          {viewingReceipt.ocrData.amount ? formatCurrency(viewingReceipt.ocrData.amount) : 'Not detected'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-1">Description</p>
+                        <p className="font-medium text-slate-900">{viewingReceipt.ocrData.description || 'Not detected'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-600 mb-1">Confidence Score</p>
+                        <p className="font-medium text-slate-900">
+                          {Math.round((viewingReceipt.ocrData.confidence || 0) * 100)}%
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-slate-500">No OCR data available</p>
+                  )}
+                </div>
+              </div>
+
+              {viewingReceipt.matchedTransactionDescription && (
+                <div className="mt-8 p-4 bg-green-50 rounded-lg">
+                  <h4 className="text-lg font-semibold text-green-900 mb-2">✓ Matched Transaction</h4>
+                  <p className="text-green-700">{viewingReceipt.matchedTransactionDescription}</p>
+                </div>
+              )}
+
+              <div className="mt-8 flex gap-4">
+                {viewingReceipt.status === 'ready' && (
+                  <button
+                    onClick={() => {
+                      handleMatchReceipt(viewingReceipt.id);
+                      setViewingReceipt(null);
+                    }}
+                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                  >
+                    Match to Transaction
+                  </button>
+                )}
+                <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
+                  Download Receipt
+                </button>
+                <button
+                  onClick={() => setViewingReceipt(null)}
+                  className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

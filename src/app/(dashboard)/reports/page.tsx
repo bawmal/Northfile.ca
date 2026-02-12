@@ -19,6 +19,7 @@ export default function ReportsPage() {
               <a href="/properties" className="text-sm font-medium text-slate-600 hover:text-slate-900">Properties</a>
               <a href="/transactions" className="text-sm font-medium text-slate-600 hover:text-slate-900">Transactions</a>
               <a href="/receipts" className="text-sm font-medium text-slate-600 hover:text-slate-900">Receipts</a>
+              <a href="/mortgages" className="text-sm font-medium text-slate-600 hover:text-slate-900">Mortgages</a>
               <a href="/reports" className="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-1">Reports</a>
             </nav>
           </div>

@@ -39,6 +39,27 @@ export default function FAQPage() {
             {/* FAQ 2 */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-purple-100">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                How do I prepare a T776 form?
+              </h2>
+              <div className="text-slate-700 leading-relaxed space-y-4">
+                <p>
+                  The T776 form reports rental income and expenses to the CRA. You'll need to track rent collected, deductible expenses (mortgage interest, property taxes, repairs, etc.), and calculate any capital cost allowance.
+                </p>
+                <p>
+                  For a complete step-by-step guide, check out our detailed blog post on 
+                  <a href="/blog/how-to-prepare-t776-ontario-rental-taxes" className="text-blue-600 hover:text-blue-700 underline ml-1">
+                    how to prepare T776 forms in Ontario
+                  </a>.
+                </p>
+                <p className="font-semibold text-slate-900">
+                  Northfile automates most of this process and generates draft T776 forms ready for filing.
+                </p>
+              </div>
+            </div>
+
+            {/* FAQ 3 */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-purple-100">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
                 What if I'm not tech-savvy?
               </h2>
               <div className="text-slate-700 leading-relaxed space-y-4">

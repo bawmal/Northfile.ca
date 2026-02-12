@@ -1,9 +1,55 @@
 'use client';
 
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import TypewriterText from "@/components/TypewriterText";
+import { useState } from "react";
 
 export default function Home() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleWaitlistSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrorMessage('');
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      email: formData.get('email') as string,
+      propertiesCount: formData.get('properties') as string,
+      currentSolution: formData.get('units') as string,
+    };
+
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        (e.target as HTMLFormElement).reset();
+      } else {
+        setSubmitStatus('error');
+        setErrorMessage(result.error || 'Failed to join waitlist. Please try again.');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      setErrorMessage('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-pink-100">
       {/* Header */}
@@ -13,9 +59,15 @@ export default function Home() {
             <span className="text-3xl font-light text-slate-900" style={{ fontFamily: 'Georgia, "Times New Roman", serif', letterSpacing: '-0.02em' }}>Northfile</span>
           </div>
           <div className="flex items-center gap-6">
-            <button className="hidden bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-lg font-medium transition-all text-sm">
-              Login now
+            <button 
+              onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all text-sm"
+            >
+              Get Started
             </button>
+            <Link href="/dashboard" className="hidden bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-lg font-medium transition-all text-sm">
+              Login now
+            </Link>
           </div>
         </div>
       </header>
@@ -142,6 +194,14 @@ export default function Home() {
                         <span>CCA impact preview (see how it affects future taxes)</span>
                       </li>
                     </ul>
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>📚 Learn more:</strong> Read our comprehensive guide on 
+                        <Link href="/blog/how-to-prepare-t776-ontario-rental-taxes" className="text-blue-600 hover:text-blue-700 underline ml-1">
+                          how to prepare T776 forms in Ontario
+                        </Link>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -454,7 +514,23 @@ export default function Home() {
           </div>
 
           <div className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200 rounded-2xl p-10 shadow-lg">
-            <form className="space-y-6">
+            {submitStatus === 'success' && (
+              <div className="mb-6 p-4 bg-green-50 border-2 border-green-200 rounded-lg">
+                <p className="text-green-800 font-semibold text-center">
+                  ✓ Success! You've been added to the waitlist. We'll be in touch soon!
+                </p>
+              </div>
+            )}
+            
+            {submitStatus === 'error' && (
+              <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                <p className="text-red-800 font-semibold text-center">
+                  ✗ {errorMessage}
+                </p>
+              </div>
+            )}
+
+            <form onSubmit={handleWaitlistSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-semibold text-slate-900 mb-2">
@@ -606,9 +682,10 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
+                disabled={isSubmitting}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white py-4 rounded-lg font-semibold text-lg transition-all shadow-lg hover:shadow-xl"
               >
-                Join the Waitlist
+                {isSubmitting ? 'Joining...' : 'Join the Waitlist'}
               </button>
 
               <p className="text-center text-sm text-slate-500">
@@ -645,7 +722,7 @@ export default function Home() {
               <ul className="space-y-2 text-sm text-slate-400">
                 <li><a href="#" className="hover:text-white transition-colors">About us</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Contact us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">Waitlist</a></li>
               </ul>
             </div>

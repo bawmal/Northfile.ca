@@ -402,3 +402,40 @@ CREATE TRIGGER update_t776_drafts_updated_at
 -- CREATE POLICY "Users can delete own receipts"
 --   ON storage.objects FOR DELETE
 --   USING (bucket_id = 'receipts' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- =====================================================
+-- WAITLIST TABLE
+-- =====================================================
+CREATE TABLE waitlist (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  properties_count TEXT,
+  current_solution TEXT,
+  referral_source TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for email lookups and duplicate prevention
+CREATE INDEX idx_waitlist_email ON waitlist(email);
+CREATE INDEX idx_waitlist_created_at ON waitlist(created_at DESC);
+
+-- RLS Policies for waitlist (public insert, admin read)
+ALTER TABLE waitlist ENABLE ROW LEVEL SECURITY;
+
+-- Allow anyone to insert into waitlist (public signup)
+CREATE POLICY "Anyone can join waitlist"
+  ON waitlist FOR INSERT
+  WITH CHECK (true);
+
+-- Only admins can view waitlist (you can adjust this based on your admin setup)
+CREATE POLICY "Admins can view waitlist"
+  ON waitlist FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.email IN ('admin@northfile.ca', 'your-admin-email@example.com')
+    )
+  );
